@@ -115,7 +115,11 @@ __pypackages__/
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
-
+#py
+tratamento_null_median.py
+tratamento_null_drop.py
+titanic_null.py
+archives
 # SageMath parsed files
 *.sage.py
 
