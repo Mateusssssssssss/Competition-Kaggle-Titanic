@@ -9,10 +9,11 @@ from sklearn.preprocessing import LabelEncoder
 # comparando as previsões com os valores reais.
 #Avaliar o desempenho de modelos de classificação (ex.: True Positives, False Positives, etc.).
 # acuracu_score: Calcula a acurácia do modelo, ou seja, a porcentagem de previsões corretas.
-from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
 #é utilizado para treinar um modelo de árvore de decisão. Ele é um classificador baseado em floresta aleatória (ensemble), 
 # que pode calcular a importância das características (atributos) do conjunto de dados durante o treinamento.
 from sklearn.ensemble import ExtraTreesClassifier
+from xgboost import XGBClassifier
 #Para visualização
 import seaborn as sb
 #Para visualização
@@ -76,15 +77,28 @@ print(x_teste)
 
 
 # Utilização do algoritimo ExtraTressClassifier para extrair as caracteristica mais importante
-forest = ExtraTreesClassifier()
-forest.fit(x_treinamento, y_treinamento)
+xg = XGBClassifier(objective='binary:logistic',  # Classificação binária
+    eval_metric='aucpr',            # Métrica de avaliação
+    n_estimators=600,             # Número de árvores
+    learning_rate=0.02,           # Taxa de aprendizado
+    max_depth=30,                  # Profundidade das árvores
+    subsample=0.5,                # Amostragem para evitar overfitting
+    colsample_bytree=0.6,         # Porcentagem de colunas usadas
+    gamma=1,                      # Evita overfitting
+    reg_lambda=0,                 # Regularização L2
+    reg_alpha=1,
+    scale_pos_weight=10,             # dá mais peso para a classe minoritária
+           )
+
+
+xg.fit(x_treinamento, y_treinamento)
 # Descobri qual os atributsos mais importantes
 #extrai a importância de cada característica.
-importancia = forest.feature_importances_
+importancia = xg.feature_importances_
 print(f'Importancia: {importancia}')
 
 
-previsoes = forest.predict(x_teste)
+previsoes = xg.predict(x_teste)
 print(previsoes)
 
 #geração da matriz de confusão
@@ -103,7 +117,7 @@ taxa_erro = 1 - taxa_acerto
 #A validação cruzada é uma técnica que divide o conjunto de dados em várias partes (folds) e 
 # treina o modelo em diferentes divisões, garantindo que o modelo tenha sido avaliado de maneira
 # mais confiável e sem viés.
-scores = cross_val_score(forest, x_treinamento, y_treinamento, cv=10)
+scores = cross_val_score(xg, x_treinamento, y_treinamento, cv=10)
 print(f'Média da acurácia: {scores.mean()}')
 # Média da acurácia: 0.8025601638504863
 #Taxa de acerto: 0.8022388059701493
@@ -131,8 +145,11 @@ previsores2 = dados2.iloc[:,[1, 3, 4, 8]].values
 previsores2[:,1] = labelencoder.transform(previsores2[:,1])
 
 #Predição do dataset2
-sobreviventes2 = forest.predict(previsores2)
+sobreviventes2 = xg.predict(previsores2)
 print(sobreviventes2)
+
+classification = classification_report(y_teste, previsores2)
+print(classification)
 
 # Adicionar a coluna 'Survived' com a previsão
 dados2['Survived'] = sobreviventes2
@@ -145,6 +162,3 @@ dados2.to_csv('teste_psclass_fare_age_sex_columns.csv', index=False)
 
 # Exibir as primeiras linhas do novo dataset com a coluna 'Survived'
 print(dados2.head())
-
-
-
