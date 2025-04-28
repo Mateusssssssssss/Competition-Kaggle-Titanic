@@ -40,7 +40,6 @@ print(age)
 age_moda = dados['Age'].mode()
 print(age_moda)
 
-dados['Age'] = dados['Age'].fillna(dados['Age'].median())
 #Frequencia com que a idade 24, aparece.
 age_frequencia = (dados['Age'] == 24).sum()
 print(age_frequencia)
