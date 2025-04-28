@@ -24,6 +24,8 @@ print(f'Moda da idade{age_moda}')
 qt_class = dados['Survived'].value_counts()
 print(f'Quantidade de Sobreviviente e não Sobreviventes\n{qt_class}')
 
+qtd_class = dados['Survived'].nunique()
+
 #Analise de correlação
 correlacao = dados[['Survived', 'Age', 'Parch', 'Pclass', 'Parch','Fare','SibSp']].corr()
 print(correlacao)
