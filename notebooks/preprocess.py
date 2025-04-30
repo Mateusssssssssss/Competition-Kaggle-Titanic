@@ -1,6 +1,7 @@
 from notebooks.eda_train import *
 from sklearn.preprocessing import LabelEncoder 
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 # formato da matriz
 previsores = dados.iloc[:,[2, 4, 5, 6, 7, 9]].values
 classe = dados.iloc[:, 1].values
@@ -14,3 +15,6 @@ x_train, x_test, y_train, y_test = train_test_split(previsores,
                                                         test_size = 0.4,
                                                         random_state = 1  
                                                         )
+sc = StandardScaler()
+x_train = sc.fit_transform(x_train)
+x_test = sc.transform(x_test)
